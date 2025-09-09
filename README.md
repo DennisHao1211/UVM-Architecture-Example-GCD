@@ -16,6 +16,7 @@ In this project, you will:
 4. Instantiate the stuff you wrote in an UVM agent.
 5. Debug the faulty RTL.
 6. Get 96% code coverage.
+   
 Don't worry if a lot of words here make no sense. In the following chapters,  we will address all of them.
 
 REFER [HERE](https://github.gatech.edu/SiliconJackets/uvm_onboarding/blob/main/EXAMPLE.md) to learn via an example.
