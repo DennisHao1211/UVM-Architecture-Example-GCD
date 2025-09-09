@@ -139,7 +139,7 @@ class monitor extends uvm_monitor;
 			@(posedge vif.clk);
 			mon_item.out = vif.out;
 			item_collect_port.write(mon_item);
-			end
+		end
 	endtask
 endclass
 ```
