@@ -10,8 +10,7 @@ setenv UVMHOME /tools/software/cadence/xcelium/latest/tools/methodology/UVM/CDNS
 In this onboarding, you will learn a high-level overview of UVM. Due to the compressed nature of this onboarding, we cannot go over 100% of the library. In each chapter, there **will** be inline links. It is imperative for you to click on them and read them to have a complete understanding. We also assume that you have some idea of what OOP is. If not, please read up on it.
 
 In this project, you will:
-1. Extend the base sequence item class.
-2. Write different sequences for different test cases.
+1. Write different sequences (by extending the base sequence) for different test cases.
 3. Create the driver, monitor, and sequencer.
 4. Instantiate the driver, monitor, and sequencer you wrote in an agent.
 5. Write the scoreboard.
