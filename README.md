@@ -13,10 +13,14 @@ source /tools/software/cadence/setup.csh
 setenv UVMHOME /tools/software/cadence/xcelium/latest/tools/methodology/UVM/CDNS-1.1d
 ```
 ## Onboarding Tasks
-In this onboarding, you will learn a high-level overview of UVM. Due to the compressed nature of this onboarding, we cannot go over 100% of the library. In this project, you will:
+In this onboarding, you will learn a high-level overview of UVM. Due to the compressed nature of this onboarding, we cannot go over 100% of the library. In each chapter, there **will** be inline links. It is imperative for you to click on them and read them. 
+
+In this project, you will:
 1. Extend the base sequence item class.
 2. Write the structure of a sequencer.
 3. Write the components of the driver, monitor, sequencer, and scoreboard.
 4. Instantiate the stuff you wrote in an UVM agent.
 5. Debug the faulty RTL.
 6. Get 96% code coverage.
+Don't worry if a lot of words here make no sense. In the following chapters,  we will address all of them.
+## UVM High Level Overview
