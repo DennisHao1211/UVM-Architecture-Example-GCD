@@ -1,7 +1,7 @@
-# A Simple UVM Example ([vlsiverify](https://vlsiverify.com/uvm/uvm-adder-example/))
+# A Simple Adder UVM Example ([vlsiverify](https://vlsiverify.com/uvm/uvm-adder-example/))
 ![How Components Connect](https://vlsiverify.com/wp-content/uploads/2021/05/Testbench-Block-Diagram.jpg)
 ## Table of Contents
-- [Adder Module](#adder-module)
+- [Module + Interface](#adder-module-and-interface)
 - [Sequence Item](#sequence-item)
 - [Sequence](#sequence)
 - [Sequencer](#sequencer)
@@ -12,7 +12,7 @@
 - [Environment](#environment)
 - [Test](#test)
 - [Top](#top)
-## Adder Module
+## Adder Module And Interface
 ```SystemVerilog
 module adder(input clk, reset, input [7:0] in1, in2, output reg [8:0] out);
 	always@(posedge clk or posedge reset) begin 
@@ -21,10 +21,15 @@ module adder(input clk, reset, input [7:0] in1, in2, output reg [8:0] out);
 	end
 endmodule
 ```
-## Interface
-
+```SystemVerilog
+interface add_if(inpt clk, input reset);
+	logic[7:0] ip1;
+	logic[7:0] ip2;
+	logic[8:0] out;	
+endinterface
+```
 ## Sequence Item
-The sequence item class contains necessary stimulus generation data members.
+The sequence item class contains the necessary stimulus generation data members.
 ```SystemVerilog
 class seq_item extends uvm_sequence_item;
 	rand bit [7:0] ip1, ip2;
@@ -134,7 +139,7 @@ class monitor extends uvm_monitor;
 			@(posedge vif.clk);
 			mon_item.out = vif.out;
 			item_collect_port.write(mon_item);
-			end
+		end
 	endtask
 endclass
 ```
