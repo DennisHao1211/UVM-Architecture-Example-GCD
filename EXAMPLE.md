@@ -1,4 +1,5 @@
 # A Simple UVM Example ([vlsiverify](https://vlsiverify.com/uvm/uvm-adder-example/))
+![https://vlsiverify.com/wp-content/uploads/2021/05/Testbench-Block-Diagram.jpg](How Components Connect)
 ## Table of Contents
 - [Adder Module](#adder-module)
 - [Sequence Item](#sequence-item)
@@ -20,6 +21,8 @@ module adder(input clk, reset, input [7:0] in1, in2, output reg [8:0] out);
 	end
 endmodule
 ```
+## Interface
+
 ## Sequence Item
 The sequence item class contains necessary stimulus generation data members.
 ```SystemVerilog
