@@ -1,5 +1,5 @@
 # A Simple UVM Example ([vlsiverify](https://vlsiverify.com/uvm/uvm-adder-example/))
-[![https://vlsiverify.com/wp-content/uploads/2021/05/Testbench-Block-Diagram.jpg](How Components Connect)]
+[![https://vlsiverify.com/wp-content/uploads/2021/05/Testbench-Block-Diagram.jpg](How Components Connect)]()
 ## Table of Contents
 - [Adder Module](#adder-module)
 - [Sequence Item](#sequence-item)
