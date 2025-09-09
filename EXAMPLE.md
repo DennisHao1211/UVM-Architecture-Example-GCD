@@ -22,9 +22,15 @@ module adder(input clk, reset, input [7:0] in1, in2, output reg [8:0] out);
 endmodule
 ```
 ## Interface
-
+```SystemVerilog
+interface add_if(inpt clk, input reset);
+	logic[7:0] in1;
+	logic[7:0] in2;
+	logic[8:0] out;	
+endinterface
+```
 ## Sequence Item
-The sequence item class contains necessary stimulus generation data members.
+The sequence item class contains the necessary stimulus generation data members.
 ```SystemVerilog
 class seq_item extends uvm_sequence_item;
 	rand bit [7:0] ip1, ip2;
