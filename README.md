@@ -12,7 +12,7 @@ In this onboarding, you will learn a high-level overview of UVM. Due to the comp
 In this project, you will:
 1. Write different sequences (by extending the base sequence) for different test cases.
 3. Create the driver, monitor, and sequencer.
-4. Instantiate the driver, monitor, and sequencer you wrote in an agent.
+4. Instantiate the driver, monitor, and sequencer in an agent.
 5. Write the scoreboard.
 6. Instantiate the agent and scoreboard in the environment.
 7. Write different tests to run the different sequences.
