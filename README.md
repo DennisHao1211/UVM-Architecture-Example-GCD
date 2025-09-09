@@ -11,11 +11,14 @@ In this onboarding, you will learn a high-level overview of UVM. Due to the comp
 
 In this project, you will:
 1. Extend the base sequence item class.
-2. Write the structure of a sequencer.
-3. Write the components of the driver, monitor, sequencer, and scoreboard.
-4. Instantiate the stuff you wrote in an UVM agent.
-5. Debug the faulty RTL.
-6. Get 96% code coverage.
+2. Write different sequences for different test cases.
+3. Create the driver, monitor, and sequencer.
+4. Instantiate the driver, monitor, and sequencer you wrote in an agent.
+5. Write the scoreboard.
+6. Instantiate the agent and scoreboard in the environment.
+7. Write different tests to run the different sequences.
+8. Debug the faulty RTL.
+9. Get 96% code coverage.
    
 Don't worry if a lot of words here make no sense. In the following chapters,  we will address all of them.
 
