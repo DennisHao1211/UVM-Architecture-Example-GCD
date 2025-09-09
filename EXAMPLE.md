@@ -1,7 +1,7 @@
 # A Simple UVM Example ([vlsiverify](https://vlsiverify.com/uvm/uvm-adder-example/))
 ![How Components Connect](https://vlsiverify.com/wp-content/uploads/2021/05/Testbench-Block-Diagram.jpg)
 ## Table of Contents
-- [Adder Module](#adder-module)
+- [Adder Module And Interface](#adder-module-and-interface)
 - [Sequence Item](#sequence-item)
 - [Sequence](#sequence)
 - [Sequencer](#sequencer)
@@ -12,7 +12,7 @@
 - [Environment](#environment)
 - [Test](#test)
 - [Top](#top)
-## Adder Module
+## Adder Module And Interface
 ```SystemVerilog
 module adder(input clk, reset, input [7:0] in1, in2, output reg [8:0] out);
 	always@(posedge clk or posedge reset) begin 
@@ -21,7 +21,6 @@ module adder(input clk, reset, input [7:0] in1, in2, output reg [8:0] out);
 	end
 endmodule
 ```
-## Interface
 ```SystemVerilog
 interface add_if(inpt clk, input reset);
 	logic[7:0] in1;
