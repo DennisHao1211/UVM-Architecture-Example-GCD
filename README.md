@@ -13,7 +13,7 @@ source /tools/software/cadence/setup.csh
 setenv UVMHOME /tools/software/cadence/xcelium/latest/tools/methodology/UVM/CDNS-1.1d
 ```
 ## Onboarding Tasks
-In this onboarding, you will learn a high-level overview of UVM. Due to the compressed nature of this onboarding, we cannot go over 100% of the library. In each chapter, there **will** be inline links. It is imperative for you to click on them and read them to have a complete understanding.
+In this onboarding, you will learn a high-level overview of UVM. Due to the compressed nature of this onboarding, we cannot go over 100% of the library. In each chapter, there **will** be inline links. It is imperative for you to click on them and read them to have a complete understanding. We also assume that you have some idea of what OOP is. If not, please read up on it.
 
 In this project, you will:
 1. Extend the base sequence item class.
