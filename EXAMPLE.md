@@ -47,6 +47,47 @@ class seq_item extends uvm_sequence_item;
 	constraint ip_c {ip1 < 100; ip2 < 100;}
 endclass
 ```
+### Code Explanation
+Inherits the `uvm_sequence_item` class.
+```SystemVerilog
+class seq_item extends uvm_sequence_item;
+```
+- `uvm_sequence_item` is the base class for all transaction-level objects.
+- This means our `seq_item` can be used as a **transaction** between the [sequencer](#sequencer) and [driver](#driver).
+
+Randomized stimulus fields.
+```SystemVerilog
+rand bit [7:0] ip1, ip2;
+bit [8:0] out;
+```
+- `ip1` and `ip2` are randomizable inputs.
+- `out` is **not** randomized, it represents the result that we be produced by the DUT or the [scoreboard](#scoreboard).
+
+Constructor for [`uvm_object`](https://vlsiverify.com/uvm/uvm-object/).
+```SystemVerilog
+function new(string name = "seq_item");
+	super.new(name);
+endfunction
+```
+- What is an `uvm_object`: it is the **base class** for lightweight, transaction-level objects. No hierarchy or [phasing](https://vlsiverify.com/uvm/uvm-phases/) is involved — these are just _objects in memory_, not part of the UVM testbench hierarchy.
+- Every `uvm_object`-derived class needs a constructor.
+- `super.new(name)` calls the parent constructor so that UVM can track and manage this object properly.
+
+[Factory](https://vlsiverify.com/uvm/uvm-factory/) registration macros.
+```SystemVerilog
+`uvm_object_utils_begin(seq_item)
+	`uvm_field_int(ip1,UVM_ALL_ON)
+	`uvm_field_int(ip2,UVM_ALL_ON)
+`uvm_object_utils_end
+```
+- What is the [factory](https://vlsiverify.com/uvm/uvm-factory/): it is a **centralized creation mechanism** in UVM. Instead of hardcoding `new()`, you use the factory (`::type_id::create`) to build objects and components.
+- `uvm_object_utils_begin/uvm_object_utils_end` registers the class with the factory.
+- `uvm_field_*` registers individual fields for use in:
+    - Printing (`print()` method)
+    - Copying / Comparing (useful in scoreboards)
+    - Recording (waveform-like logging)
+- `UVM_ALL_ON` enables all automation features for these fields.
+- **STOP HERE**: Utility and field macros are an important concept. Read [this](https://www.chipverify.com/uvm/uvm-field-macros) before continuing on as the notes above only cover the specifics of this example.
 ## Sequence
 The sequence creates the stimulus and drives them to the driver via sequencer.
 ```SystemVerilog
