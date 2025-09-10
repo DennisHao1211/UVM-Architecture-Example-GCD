@@ -111,6 +111,38 @@ class base_seq extends uvm_sequence#(seq_item);
 	endtask
 endclass
 ```
+### Code Explanation
+Inherits the `uvm_sequence` base class (parameterized by your transaction type).
+```SystemVerilog
+class base_seq extends uvm_sequence#(seq_item);
+```
+- `uvm_sequence#(T)` is the base for **active** objects that create and send transactions (`T`) to a sequencer.
+- An active object is one that has a process or task running in time which generates or consumes transactions.
+- Here `T` is `seq_item`, so this sequence will produce `seq_item` transactions for the [driver](#driver).
+
+Constructor for `uvm_object`. Refer to previous notes.
+
+Main sequence body.
+```SystemVerilog
+task body();
+	`uvm_info(get_type_name(), "Base seq: Inside Body", UVM_LOW);
+	`uvm_do(req);
+endtask
+```
+- `body()` is where you generate and send transactions. It is a `task`, so it can consume simulation time.
+- `` `uvm_do(req)`` is a convenience macro. Read [this](https://www.chipverify.com/uvm/uvm-do-macros) for more details. This means one **randomized** `seq_item` is produced and handed to the sequencer/driver.
+- Another common convenience macro is `` `uvm_do_with(req, {<constraints>}) ``. This is how we do directed tests.
+- Instead of `print`, in UVM we use `` `uvm_info`` for logging. There are different verbosity levels. Refer [here](https://www.chipverify.com/uvm/report-functions) for more information on different types and when they are used.
+- Once you create a base sequence, you can extend it to create more sequences with different conditions (different input vectors, different constraints etc.)
+- Notice how in this sequence, it only sends **one** transaction. Below is an example to send 100 randomized transactions:
+```SystemVerilog
+task body();
+	`uvm_info(get_type_name(), "Base seq: Inside Body", UVM_LOW);
+	repeat(100) begin
+		`uvm_do(req);
+	end
+endtask
+```
 ## Sequencer
 The sequencer is a mediator who establishes a connection between sequence and driver.
 ```SystemVerilog
