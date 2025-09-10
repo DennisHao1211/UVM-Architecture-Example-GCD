@@ -22,7 +22,7 @@ module adder(input clk, reset, input [7:0] in1, in2, output reg [8:0] out);
 endmodule
 ```
 ```SystemVerilog
-interface add_if(inpt clk, input reset);
+interface add_if(input clk, input reset);
 	logic[7:0] ip1;
 	logic[7:0] ip2;
 	logic[8:0] out;	
