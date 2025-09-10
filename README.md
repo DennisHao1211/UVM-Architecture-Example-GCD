@@ -34,27 +34,13 @@ REFER [HERE](https://github.gatech.edu/SiliconJackets/uvm_onboarding/blob/main/E
    - Write different tests to run the different sequences.
    - Debug the faulty RTL.
    - Get 96% code coverage.
-  
-## Make Commands for Running your Testbench
-The Makefile resides in the sim/behav/ directory which is where you will run your testbench and keep all output files
-
-### `make link_src`
-Run this first. This command creates symbolic links to your src code in the /sim/behav/ directory so that you can run code from there
-
-### `make xrun`
-This command compiles and runs your testbench. It creates all output files needed to run the cadence waveform and coverage tools
-
-### `make coverage`
-This command runs IMC, the Cadence coverage tool.
-
-### `make simvision`
-This command runs simvision, the Cadence tool for visualizing and analyzing waveforms
-
-### `make run_and_view`
-This command calls both `make xrun` and make `simvision`
-
-### `make clean`
-This command removes all simulation output files and symbolic links in your /sim/behav/ directory
+4. Commands to run your testbench
+   1. cd to the sim/behav/ subdirectory
+   2. Run `make link_src`
+   3. Run `make xrun`
+      - To view the DUT waveform, run `make simvision`
+      - To view the Coverage tool, run `make coverage`
+      - To clean up output files and symbolic links to your src code, run `make clean`
 
 ## Directory Overview
 
