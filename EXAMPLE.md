@@ -47,6 +47,7 @@ class seq_item extends uvm_sequence_item;
 	constraint ip_c {ip1 < 100; ip2 < 100;}
 endclass
 ```
+
 ### Code Explanation
 Inherits the `uvm_sequence_item` class.
 ```SystemVerilog
@@ -111,6 +112,7 @@ class base_seq extends uvm_sequence#(seq_item);
 	endtask
 endclass
 ```
+
 ### Code Explanation
 Inherits the `uvm_sequence` base class (parameterized by your transaction type).
 ```SystemVerilog
@@ -120,7 +122,14 @@ class base_seq extends uvm_sequence#(seq_item);
 - An active object is one that has a process or task running in time which generates or consumes transactions.
 - Here `T` is `seq_item`, so this sequence will produce `seq_item` transactions for the [driver](#driver).
 
-Constructor for `uvm_object`. Refer to previous notes.
+[Factory](https://vlsiverify.com/uvm/uvm-factory/) registration macros.
+```SystemVerilog
+`uvm_object_utils(base_seq)
+```
+- Notice how it is different to the [sequence item](#sequence-item). While a sequence item and a sequencer are both `uvm_object`, because the sequence does not have any fields, the syntax is *slightly* different.
+
+Constructor for `uvm_object`. 
+- Refer to previous notes.
 
 Main sequence body.
 ```SystemVerilog
@@ -144,7 +153,7 @@ task body();
 endtask
 ```
 ## Sequencer
-The sequencer is a mediator who establishes a connection between sequence and driver.
+The sequencer is a mediator who establishes a connection between [sequence](#sequence) and [driver](#driver).
 ```SystemVerilog
 class seqcr extends uvm_sequencer#(seq_item);
 	`uvm_component_utils(seqcr)
@@ -158,6 +167,7 @@ class seqcr extends uvm_sequencer#(seq_item);
 	endfunction
 endclass
 ```
+
 ### Code Explanation
 Inherits the `uvm_sequencer` base class (parameterized by your transaction type).
 - Refer to notes above.
@@ -190,6 +200,7 @@ The driver drives randomized transactions or sequence items to DUT as a pin-leve
 ```SystemVerilog
 class driver extends uvm_driver#(seq_item);
 	virtual add_if vif;
+	seq_item req; 
 	`uvm_component_utils(driver)
 	
 	function new(string name = "driver", uvm_component parent = null);
@@ -214,19 +225,74 @@ class driver extends uvm_driver#(seq_item);
 	endtask
 endclass
 ```
+
+### Code Explanation
+Inherits the `uvm_driver` base class (parameterized by your transaction type).
+- Refer to notes above.
+
+Virtual Interface Handle.
+```SystemVerilog
+virtual add_if vif;
+```
+- A [virtual interface](https://vlsiverify.com/system-verilog/virtual-interface/) is just a reference (pointer) to a real interface instance. It doesn’t hold signals itself. In UVM, this reference is bound at runtime through the [`uvm_config_db`](https://vlsiverify.com/uvm/uvm_config_db-in-uvm/): the top-level testbench sets the actual interface into the config database, and components like the driver retrieve that reference in `build_phase`.
+
+[Factory](https://vlsiverify.com/uvm/uvm-factory/) registration macros.
+- Refer to prior notes.
+
+Constructor.
+- Refer to prior notes.
+
+[Build Phase](https://vlsiverify.com/uvm/uvm-phases/)
+```SystemVerilog
+function void build_phase(uvm_phase phase);
+	super.build_phase(phase);
+	if(!uvm_config_db#(virtual add_if) :: get(this, "", "vif", vif))
+	  `uvm_fatal(get_type_name(), "Not set at top level");
+endfunction
+```
+- Retrieves the `vif` from the configuration database.
+- What is [`uvm_config_db`](https://vlsiverify.com/uvm/uvm_config_db-in-uvm/): A global key-value store for passing configuration (like virtual interfaces) into UVM components. 
+```SystemVerilog
+// Set Key-Value Pair
+uvm_config_db#(type)::set(parent, inst_path, field_name, value); 
+
+// Get Key-Value Pair
+uvm_config_db#(type)::get(this, inst_path, field_name, var)
+````
+- `type`: the data type being stored (e.g., `virtual add_if`)
+- `parent`: scope where it’s set (`null` means global)
+- `inst_path`: hierarchical path to target component (e.g., `"env.agent.driver"`)
+- `field_name`: key name (string)
+- `value` / `var`: the actual object or variable reference
+- **STOP HERE**: UVM `config_db` is an important concept. It is imperative that you read [this](https://vlsiverify.com/uvm/uvm_config_db-in-uvm/).
+
+[Run Phase](https://vlsiverify.com/uvm/uvm-phases/)
+```SystemVerilog
+task run_phase (uvm_phase phase);
+	forever begin
+		// Driver to the DUT
+		seq_item_port.get_next_item(req);
+		vif.ip1 <= req.ip1;
+		vif.ip2 <= req.ip2;
+		seq_item_port.item_done();
+	end
+endtask
+```
+- `seq_item_port.get_next_item(req);` blocks until a transaction is avaliable
+- `vif.ip1 <= req.ip1` and variants drives the DUT via the virtual interface from the data encapsulated in the [sequence item](#sequence-item).
+- `seq_item_port.item_done();` acknowledges completion. Notifies the sequencer we are done so it can send in more transactors. 
+- The `seq_item_port` formalizes the handshake between the sequence, sequencer and driver.
 ## Monitor
 A UVM monitor is a passive component used to capture DUT signals using a virtual interface and translate them into a sequence item format.
 ```SystemVerilog
 class monitor extends uvm_monitor;
 	virtual add_if vif;
 	uvm_analysis_port #(seq_item) item_collect_port;
-	seq_item mon_item;
 	`uvm_component_utils(monitor)
 	
 	function new(string name = "monitor", uvm_component parent = null);
 		super.new(name, parent);
 		item_collect_port = new("item_collect_port", this);
-		mon_item = new();
 	endfunction
 	
 	function void build_phase(uvm_phase phase);
@@ -239,18 +305,70 @@ class monitor extends uvm_monitor;
 		forever begin
 			wait(!vif.reset);
 			@(posedge vif.clk);
-			mon_item.ip1 = vif.ip1;
-			mon_item.ip2 = vif.ip2;
-			`uvm_info(get_type_name, $sformatf("ip1 = %0d, ip2 = %0d", mon_item.ip1, mon_item.ip2), UVM_HIGH);
+			seq_item tr = seq_item::type_id::create("tr");
+			tr.ip1 = vif.ip1;
+			tr.ip2 = vif.ip2;
+			`uvm_info(get_type_name, $sformatf("ip1 = %0d, ip2 = %0d", tr.ip1, tr.ip2), UVM_HIGH);
 			@(posedge vif.clk);
-			mon_item.out = vif.out;
-			item_collect_port.write(mon_item);
+			tr.out = vif.out;
+			item_collect_port.write(tr);
 		end
 	endtask
 endclass
 ```
+
+### Code Explanation
+Inherits the `uvm_monitor` base class (parameterized by your transaction type).
+- Refer to notes above.
+
+Virtual Interface Handle.
+- Refer to notes above.
+
+[Analysis Port](https://www.chipverify.com/uvm/uvm-tlm-analysis-port)
+```SystemVerilog
+uvm_analysis_port #(seq_item) item_collect_port;
+```
+- It is a broadcast port.
+- Any number of subscribers (scoreboards, coverage collectors, subscribers) can be connected to it and will **automatically receive a copy** of the transaction.
+	- Publisher = monitor (sends observed transactions).
+	- Subscriber = scoreboard, coverage, logger (receive and process them).
+
+[Factory](https://vlsiverify.com/uvm/uvm-factory/) registration macros.
+- Refer to prior notes.
+
+Constructor
+```SystemVerilog
+	function new(string name = "monitor", uvm_component parent = null);
+		super.new(name, parent);
+		item_collect_port = new("item_collect_port", this);
+	endfunction
+```
+- `item_collect_port = new("item_collect_port", this);` creates the analysis port.
+
+[Build Phase](https://vlsiverify.com/uvm/uvm-phases/) with [`uvm_config_db`](https://vlsiverify.com/uvm/uvm_config_db-in-uvm/)
+- Refer to prior notes.
+
+[Run Phase](https://vlsiverify.com/uvm/uvm-phases/)
+```SystemVerilog
+task run_phase (uvm_phase phase);
+	forever begin
+		wait(!vif.reset);
+		@(posedge vif.clk);
+		seq_item tr = seq_item::type_id::create("tr");
+		tr.ip1 = vif.ip1;
+		tr.ip2 = vif.ip2;
+		@(posedge vif.clk);
+		tr.out = vif.out;
+		item_collect_port.write(tr);
+	end
+endtask
+```
+- `seq_item tr = seq_item::type_id::create("tr");` we can do this because we registered `seq_item` with the factory. Enables **polymorphic substitution**: you can override `seq_item` with a different class (e.g., `my_seq_item`) in your test without changing the monitor/sequence code.
+- Monitor looks at the pins and encapsulate the output back into the `seq_item` to be published to the [scoreboard](#scoreboard) via the analysis port. 
+- `item_collect_port.write(tr);` publishes the item.
+- If DUT latency differs, adjust the number of `@(posedge vif.clk);` between input and output sampling.
 ## Agent
-An agent is a container that holds and connects the driver, monitor, and sequencer instances.
+An agent is a container that holds and connects the driver, monitor, and sequencer instances. Refer to the image at the very top.
 ```SystemVerilog
 class agent extends uvm_agent;
 	`uvm_component_utils(agent)
@@ -264,7 +382,7 @@ class agent extends uvm_agent;
 	
 	function void build_phase(uvm_phase phase);
 		super.build_phase(phase);
-		if(get_is_active == UVM_ACTIVE) begin 
+		if(get_is_active() == UVM_ACTIVE) begin 
 			drv = driver::type_id::create("drv", this);
 			seqr = seqcr::type_id::create("seqr", this);
 		end
@@ -273,12 +391,57 @@ class agent extends uvm_agent;
 	endfunction
 	
 	function void connect_phase(uvm_phase phase);
-		if(get_is_active == UVM_ACTIVE) begin 
+		if(get_is_active() == UVM_ACTIVE) begin 
 			drv.seq_item_port.connect(seqr.seq_item_export);
 		end
 	endfunction
 endclass
 ```
+
+### Code Explanation
+Inherits the `uvm_monitor` base class (parameterized by your transaction type).
+- Refer to notes above.
+
+[Factory](https://vlsiverify.com/uvm/uvm-factory/) registration macros.
+- Refer to prior notes.
+
+Instantiation of Sub-components
+```SystemVerilog
+driver drv;
+seqcr seqr;
+monitor mon;
+```
+- Handles for the agent's child components
+
+Constructor
+- Refer to prior notes.
+
+[Build Phase](https://vlsiverify.com/uvm/uvm-phases/)
+```SystemVerilog
+function void build_phase(uvm_phase phase);
+	super.build_phase(phase);
+	if(get_is_active() == UVM_ACTIVE) begin 
+		drv = driver::type_id::create("drv", this);
+		seqr = seqcr::type_id::create("seqr", this);
+	end
+	
+	mon = monitor::type_id::create("mon", this);
+endfunction
+```
+- Active agent: builds driver and sequencer in addition to the monitor. Used when we want to drive stimulus into the DUT.
+- Passive agent: builds monitor only. Used when we only need to observe and check DUT activity without controlling it.
+- Uses the [factory](https://vlsiverify.com/uvm/uvm-factory/)  so tests can override implementations.
+
+[Connect Phase](https://vlsiverify.com/uvm/uvm-phases/)
+```SystemVerilog
+function void connect_phase(uvm_phase phase);
+	if(get_is_active() == UVM_ACTIVE) begin 
+		drv.seq_item_port.connect(seqr.seq_item_export);
+	end
+endfunction
+```
+- What is Connect Phase: The connect phase is a UVM simulation phase used to wire up TLM ports and exports between components.
+- `drv.seq_item_port.connect(seqr.seq_item_export);` connects the driver’s pull port to the sequencer’s export so the driver can fetch sequence items.
 ## Scoreboard
 The UVM scoreboard is a component that checks the functionality of the DUT. It receives transactions from the monitor using the analysis export for checking purposes.
 ```SystemVerilog
@@ -309,7 +472,7 @@ class scoreboard extends uvm_scoreboard;
 				sb_item = item_q.pop_front();
 				$display("----------------------------------------------------------------------------------------------------------");
 				if(sb_item.ip1 + sb_item.ip2 == sb_item.out) begin
-					`uvm_info(get_type_name, $sformatf("Matched: ip1 = %0d, ip2 = %0d, out = %0d", sb_item.ip1, sb_item.ip2, sb_item.out),UVM_LOW);
+					`uvm_info(get_type_name(), $sformatf("Matched: ip1 = %0d, ip2 = %0d, out = %0d", sb_item.ip1, sb_item.ip2, sb_item.out),UVM_LOW);
 				end
 				else begin
 					`uvm_error(get_name, $sformatf("NOT matched: ip1 = %0d, ip2 = %0d, out = %0d", sb_item.ip1, sb_item.ip2, sb_item.out));
@@ -320,6 +483,63 @@ class scoreboard extends uvm_scoreboard;
 	endtask
 endclass
 ```
+
+### Code Explanation
+Inherits the `uvm_scoreboard` base class (parameterized by your transaction type).
+- Unlike drivers/monitors, a scoreboard is **purely passive**: it consumes transactions and checks correctness.
+
+[Analysis Port](https://www.chipverify.com/uvm/uvm-tlm-analysis-port)
+```SystemVerilog
+uvm_analysis_port #(seq_item) item_collect_export;
+```
+- When the monitor calls `item_collect_port.write(tr)`, the scoreboard’s `write()` method is automatically invoked.
+- To connect the `item_collect_port` in monitor to `item_collect_export` in scoreboard, it is done in the environment.
+
+[Factory](https://vlsiverify.com/uvm/uvm-factory/) registration macros.
+- Refer to prior notes.
+
+Constructor
+```SystemVerilog
+function new(string name = "scoreboard", uvm_component parent = null);
+	super.new(name, parent);
+	item_collect_export = new("item_collect_export", this);
+endfunction
+```
+- Creates `item_collect_export`
+
+Build Phase
+- Refer to previous notes.
+
+Write Method
+```SystemVerilog
+function void write(seq_item req);
+  item_q.push_back(req);
+endfunction
+```
+- Pushes item into a local queue for processing.
+
+[Run Phase](https://vlsiverify.com/uvm/uvm-phases/)
+```SystemVerilog
+	task run_phase (uvm_phase phase);
+		seq_item sb_item;
+		forever begin
+			wait(item_q.size > 0);
+			
+			if(item_q.size > 0) begin
+				sb_item = item_q.pop_front();
+
+				if(sb_item.ip1 + sb_item.ip2 == sb_item.out) begin
+					`uvm_info(get_type_name(), $sformatf("Matched: ip1 = %0d, ip2 = %0d, out = %0d", sb_item.ip1, sb_item.ip2, sb_item.out),UVM_LOW);
+				end
+				else begin
+					`uvm_error(get_name, $sformatf("NOT matched: ip1 = %0d, ip2 = %0d, out = %0d", sb_item.ip1, sb_item.ip2, sb_item.out));
+				end;
+			end
+		end
+	endtask
+```
+- `wait(item_q.size > 0);` wait until there is item in queue, then pop it out for processing.
+- **The Golden Model Is In Here**.
 ## Environment
 An environment provides a container for agents, scoreboards, and other verification components.
 ```SystemVerilog
@@ -343,6 +563,9 @@ class env extends uvm_env;
 	endfunction
 endclass
 ```
+
+### Code Explanation
+At this point of the tutorial, if you have read and understood everything above. You should be able to derive what is going on here. If you have any questions, please go back to the appropriate sections and reread it, ask ChatGPT or a DV lead.
 ## Test
 The test is at the top of the hierarchical component that initiates the environment component construction.
 ```SystemVerilog
@@ -373,6 +596,25 @@ class base_test extends uvm_test;
 	endtask
 endclass
 ```
+### Code Explanation
+At this point of the tutorial, if you have read and understood everything above. You should be able to derive most of the things going on here. If you have any questions, please go back to the appropriate sections and reread it, ask ChatGPT or a DV lead.
+
+Objections
+```SystemVerilog
+phase.raise_objection(this);
+// Stuff
+phase.drop_objection(this);
+```
+- By default, when all components finish their `run_phase`, UVM tries to end the simulation.
+- If you want the simulation to keep running (e.g., while sequences are generating stimulus), you must **raise an objection**.
+- When you’re done, you **drop the objection**, and UVM knows it can safely end the phase.
+
+Starting the Sequence
+```SystemVerilog
+bseq.start(env_o.agt.seqr);
+```
+- We might have multiple environments and multiple agents with different sequencer. 
+- This line tells us which sequence to run and where is the sequencer to generate the stimulus.
 ## Top
 The testbench top is a static container that has an instantiation of DUT and interfaces.
 ```SystemVerilog
@@ -400,3 +642,5 @@ module tb_top;
 	end
 endmodule
 ```
+### Code Explanation
+Instantiates everything. Stores the interface in `config_db`.
