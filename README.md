@@ -38,8 +38,8 @@ REFER [HERE](https://github.gatech.edu/SiliconJackets/uvm_onboarding/blob/main/E
    1. cd to the sim/behav/ subdirectory
    2. Run `make link_src`
    3. Run `make xrun`
-      - To view the DUT waveform, run `make simvision`
-      - To view the Coverage tool, run `make coverage`
+      - To run the Cadence waveform tool, run `make simvision`
+      - To run the Cadence coverage tool, run `make coverage`
       - To clean up output files and symbolic links to your src code, run `make clean`
 
 ## Directory Overview
