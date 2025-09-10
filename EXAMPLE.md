@@ -158,6 +158,33 @@ class seqcr extends uvm_sequencer#(seq_item);
 	endfunction
 endclass
 ```
+### Code Explanation
+Inherits the `uvm_sequencer` base class (parameterized by your transaction type).
+- Refer to notes above.
+
+[Factory](https://vlsiverify.com/uvm/uvm-factory/) registration macros.
+```SystemVerilog
+`uvm_component_utils(seqcr)
+```
+- Registers `seqcr` as a **component** (not object) in the UVM factory.
+- What is a `uvm_component`: lives in the testbench hierarchy, has simulation [phases](https://vlsiverify.com/uvm/uvm-phases/), and is static. It exists throughout the entire simulation.
+
+Constructor
+```SystemVerilog
+function new(string name = "seqcr", uvm_component parent = null);
+	super.new(name, parent);
+endfunction
+```
+- Note the difference between this constructor and the constructor associated with an `uvm_object`.
+
+[Build Phase](https://vlsiverify.com/uvm/uvm-phases/)
+```SystemVerilog
+function void build_phase(uvm_phase phase);
+	super.build_phase(phase);
+endfunction
+```
+- The build phase in UVM is a simulation phase where all `uvm_component`s are constructed and configured before simulation runs. You typically use it to create sub-components (via the factory) and set up configuration objects.
+- **STOP HERE**: UVM phasing are an important concept. It is imperative that you read [this](https://vlsiverify.com/uvm/uvm-phases/).
 ## Driver
 The driver drives randomized transactions or sequence items to DUT as a pin-level activity using an interface.
 ```SystemVerilog
