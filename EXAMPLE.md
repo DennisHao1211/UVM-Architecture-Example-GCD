@@ -88,6 +88,12 @@ endfunction
     - Recording (waveform-like logging)
 - `UVM_ALL_ON` enables all automation features for these fields.
 - **STOP HERE**: Utility and field macros are an important concept. Read [this](https://www.chipverify.com/uvm/uvm-field-macros) before continuing on as the notes above only cover the specifics of this example.
+
+Constraint block.
+```SystemVerilog
+constaint ip_c {ip1 < 100; ip2 < 100;}
+```
+- Nothing special here. Just your regular SystemVerilog constraint.
 ## Sequence
 The sequence creates the stimulus and drives them to the driver via sequencer.
 ```SystemVerilog
