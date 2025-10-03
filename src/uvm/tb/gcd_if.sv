@@ -20,7 +20,4 @@ timeprecision 100ps;
     logic [TB_WIDTH-1:0] gcd_o;
     logic valid_o;
 
-    // Feel free to define tasks to drive/collect signals for the driver/monitor here
-    // ...
-
 endinterface : gcd_if

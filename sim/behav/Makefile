@@ -5,19 +5,12 @@
 #--------------------------------------------------------------------
 
 # ===== User-configurable knobs =====================================
-
-# This is to change the test you want to run in simulation. 
 TESTNAME        ?= all_gcd_test 
-# Verbosity sets what messages are printed during simulation depending on level
+UVM_MAX_QUIT    ?= 1
 UVM_VERBOSITY   ?= UVM_FULL
-
-# ===================================================================
 
 # Top level testbench
 TOPLEVEL        ?= gcd_tb_top
-
-VERILOG_DEFINES := +SIM=1
-UVM_MAX_QUIT    ?= 1
 
 # Define source directories relative to the project root
 SRC_DIRS := src/sv/rtl \
@@ -46,6 +39,8 @@ SV_FILES := src/sv/rtl/gcd_pkg.sv \
 			src/uvm/tests/gcd_test_pkg.sv \
 			src/uvm/tb/gcd_if.sv \
 			src/uvm/tb/gcd_tb_top.sv \
+
+VERILOG_DEFINES := +SIM=1
 
 # ===== Tool setup ==================================================
 XRUN_FLAGS = -64bit -sv -linedebug -access +rwc \
@@ -115,9 +110,9 @@ coverage:
 clean:
 	@echo "Cleaning workspace..."
 	rm -rf *.v *.sv *.svh *.include
-	rm -rf xcelium.d simv* *.log *.shm cov_work
+	rm -rf xcelium.d simv* *.log *.shm cov_work .simvision
 	rm -rf waves.shm* *.fsdb *.vpd
-	rm -rf simulation.history
+	rm -rf simulation.history xrun.key
 	@echo "Cleaning existing symbolic links..."
 	@for src_dir in $(SRC_DIRS); do \
 		if [ -d "$$src_dir" ]; then \

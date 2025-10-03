@@ -40,6 +40,9 @@ module gcd_tb_top;
         .valid_o(if0.valid_o));
 
     initial begin
+        // Initialize waveform dumping
+        $shm_open("waves.shm");
+        $shm_probe("AS");
         // Store the virtual interface handle 'if0' in the UVM configuration database
         // under the field name "vif" so all components under uvm_root can access it.
         uvm_config_db #(virtual gcd_if)::set(uvm_root::get(), "*", "vif", if0);

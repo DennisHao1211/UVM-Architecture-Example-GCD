@@ -18,6 +18,7 @@ class gcd_seq_item extends uvm_sequence_item;
         // Register data fields for randomization and recording
         `uvm_field_int(data_a, UVM_ALL_ON)
         `uvm_field_int(data_b, UVM_ALL_ON)
+        `uvm_field_int(result_gcd, UVM_ALL_ON)
     `uvm_object_utils_end
 
     // UVM Constructor
