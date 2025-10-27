@@ -103,7 +103,7 @@ simvision:
 run_and_view: xrun simvision
 
 coverage:
-	/tools/software/cadence/vmanager/latest/tools.lnx86/vmgr/bin/imc -load cov_work/scope/test &
+	/tools/software/cadence/vmanager/25.09.020/tools.lnx86/vmgr/bin/imc -load cov_work/scope/test &
 
 # ===== Cleanup =====================================================
 .PHONY: clean
