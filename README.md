@@ -72,9 +72,9 @@ This subdirectory contains the testbench top and interface
 This subdirectory contains the base test and test library
 
 ## Deliverables
-The only deliverable for this onboarding is a working UVM testbench with at least a 96% DUT coverage score
+The deliverables for this onboarding include a screenshot of at least 96% coverage score, a zip file of the UVM src files, and a screenshot of a passing simulation log.
 
-If you have any issues or questions, feel free to reach out to Andrew Chen or Ethan Huang on Discord.
+When you finish the onboarding, please send your deliverables to one of the leads on discord. If you have any issues or questions, feel free to reach out to any of the DV leads on Discord.
    
 ## Alternate (and probably better) Resources:
 - Notes by Andrew: [here](https://docs.google.com/document/d/13cL66MN8yQ5Vs8Dwl6D2McG42TZfc3M4IRJPkBa-3QA/edit?usp=sharing)
