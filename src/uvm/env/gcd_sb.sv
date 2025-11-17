@@ -15,8 +15,21 @@
 
 class gcd_sb extends uvm_scoreboard;
 
+    // 1) Register with factory
+    `uvm_component_utils(gcd_sb)
+
+    // 3) Analysis import to receive transactions from monitor
+    uvm_analysis_imp #(gcd_seq_item, gcd_sb) analysis_export;
+
     // Scoreboard statistics. You can optionally add more if you want
     int num_in, num_correct, num_incorrect;
+
+    // 2) Basic constructor
+    function new(string name="gcd_sb", uvm_component parent=null);
+      super.new(name, parent);
+      analysis_export = new("analysis_export", this);
+      num_in = 0; num_correct = 0; num_incorrect = 0;
+    endfunction
 
     // Golden function to compute GCD
     function automatic bit [7:0] compute_gcd(bit [7:0] a, bit [7:0] b);
@@ -28,11 +41,23 @@ class gcd_sb extends uvm_scoreboard;
             x = temp;
         end
         return x;
-    endfunction
+    endfunction : compute_gcd
 
+    // 4) Handle incoming transactions
     virtual function void write (gcd_seq_item tr);
-
-    endfunction
+      bit [7:0] exp = compute_gcd(tr.data_a, tr.data_b);
+      num_in++;
+      if (tr.result_gcd === exp) begin
+        num_correct++;
+        `uvm_info("SB", $sformatf("Match: A=%0d B=%0d GCD=%0d",
+                                tr.data_a, tr.data_b, tr.result_gcd), UVM_LOW)
+      end
+      else begin
+        num_incorrect++;
+        `uvm_error("SB", $sformatf("Mismatch: A=%0d B=%0d got=%0d exp=%0d",
+                                 tr.data_a, tr.data_b, tr.result_gcd, exp))
+      end
+    endfunction : write
 
     virtual function void report_phase(uvm_phase phase);
         `uvm_info(get_type_name(), $sformatf("Report:\n\n   Scoreboard: Simulation Statistics \n     Num In:   %0d     Num Correct: %0d\n     Num Incorrect: %0d\n", num_in, num_correct, num_incorrect), UVM_LOW)

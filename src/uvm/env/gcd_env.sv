@@ -12,12 +12,29 @@
 
 class gcd_env extends uvm_env;
 
-    function void build_phase(uvm_phase phase);
+  // 1) Register with factory
+  `uvm_component_utils(gcd_env)
 
-    endfunction : build_phase
+  // Sub-components
+  gcd_agent agent;
+  gcd_sb    sb;
 
-    function void connect_phase(uvm_phase phase);
-        
-    endfunction : connect_phase
+  // 2) Basic constructor
+  function new(string name="gcd_env", uvm_component parent=null);
+    super.new(name, parent);
+  endfunction
+
+  // 3) Instantiate the agent and scoreboard
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    agent = gcd_agent::type_id::create("agent", this);
+    sb    = gcd_sb   ::type_id::create("sb",    this);
+  endfunction : build_phase
+
+  // 4) Connect monitor.ap to scoreboard.analysis_export
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    agent.mon.ap.connect(sb.analysis_export);
+  endfunction : connect_phase
 
 endclass : gcd_env

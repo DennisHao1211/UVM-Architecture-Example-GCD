@@ -1,0 +1,12 @@
+//
+// File created by:  xrun
+// Do not modify this file
+//
+/nethome/hhao40/uvm_onboarding/src/sv/rtl/gcd_pkg.sv
+/nethome/hhao40/uvm_onboarding/src/sv/rtl/gcd.sv
+/nethome/hhao40/uvm_onboarding/src/uvm/sequences/gcd_seq_pkg.sv
+/nethome/hhao40/uvm_onboarding/src/uvm/agent/gcd_agent_pkg.sv
+/nethome/hhao40/uvm_onboarding/src/uvm/env/gcd_env_pkg.sv
+/nethome/hhao40/uvm_onboarding/src/uvm/tests/gcd_test_pkg.sv
+/nethome/hhao40/uvm_onboarding/src/uvm/tb/gcd_if.sv
+/nethome/hhao40/uvm_onboarding/src/uvm/tb/gcd_tb_top.sv

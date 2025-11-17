@@ -43,14 +43,28 @@ module gcd
 
     // Combinational next state logic
     always_comb begin
-        //default values
-        next_state_r = STATEX;
-        case (state_r)
-            IDLE: next_state_r = (valid_i) ? LOADING : IDLE;
-            LOADING: next_state_r = COMPUTING;
-            COMPUTING: next_state_r = (a_reg == b_reg) ? DONE : COMPUTING;
-            DONE: next_state_r = IDLE;
-            default: next_state_r = STATEX;
+        // Default stay-in-state unless conditions trigger transition
+        next_state_r = state_r;
+        unique case (state_r)
+            IDLE: begin
+                if (valid_i) begin
+                    next_state_r = LOADING;
+                end
+            end
+            LOADING: begin
+                next_state_r = COMPUTING;
+            end
+            COMPUTING: begin
+                if ((a_reg == b_reg) || (a_reg == '0) || (b_reg == '0)) begin
+                    next_state_r = DONE;
+                end
+            end
+            DONE: begin
+                next_state_r = IDLE;
+            end
+            default: begin
+                next_state_r = STATEX;
+            end
         endcase
     end
 
@@ -66,7 +80,6 @@ module gcd
             valid_o <= 1'b0;
             case (next_state_r)
                 IDLE: begin
-                    valid_o <= 1'b0;
                     a_reg <= '0;
                     b_reg <= '0;
                 end
@@ -75,14 +88,16 @@ module gcd
                     b_reg <= b_i;
                 end
                 COMPUTING: begin
-                    if (a_reg > b_reg) begin
+                    if ((a_reg == '0) || (b_reg == '0) || (a_reg == b_reg)) begin
+                        // Hold values; DONE state will emit result
+                    end else if (a_reg > b_reg) begin
                         a_reg <= a_reg - b_reg;
                     end else if (b_reg > a_reg) begin
                         b_reg <= b_reg - a_reg;
                     end
                 end
                 DONE: begin
-                    gcd_o <= 1'b1;
+                    gcd_o   <= (a_reg == '0) ? b_reg : a_reg;
                     valid_o <= 1'b1;
                 end
                 default: begin
@@ -98,5 +113,4 @@ module gcd
     //=========================================================================//
 
 endmodule
-
 

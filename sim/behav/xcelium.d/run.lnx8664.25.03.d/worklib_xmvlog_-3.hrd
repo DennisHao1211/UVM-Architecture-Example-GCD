@@ -1,0 +1,24 @@
+//
+// File created by:  xrun
+// Do not modify this file
+//
+-sv
+-LINEDEBUG
+-DEFINE
+SIM=1
+-INCDIR
+src/uvm/tests
+-INCDIR
+src/uvm/agent
+-INCDIR
+src/uvm/sequences
+-INCDIR
+src/uvm/env
+-INCDIR
+src/uvm/tb
+-I_INCDIR
+/tools/software/cadence/xcelium/latest/tools/methodology/UVM/CDNS-1.1d/sv/src
+-DEFINE
+USE_PARAMETERIZED_WRAPPER
+-I_INCDIR
+/tools/software/cadence/xcelium/latest/tools/methodology/UVM/CDNS-1.1d/additions/sv

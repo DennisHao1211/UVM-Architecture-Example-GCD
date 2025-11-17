@@ -1,0 +1,38 @@
+//
+// File created by:  xrun
+// Do not modify this file
+//
+-INPUT
+"@source /tools/software/cadence/xcelium/latest/tools/methodology/UVM/CDNS-1.1d/additions/sv/files/tcl/uvm_sim.tcl"
++UVM_MAX_QUIT_COUNT=1
++UVM_VERBOSITY=UVM_FULL
++define++SIM=1
+-uvmhome
+/tools/software/cadence/xcelium/latest/tools/methodology/UVM/CDNS-1.1d
+-sv_lib
+/tools/software/cadence/xcelium/latest/tools/methodology/UVM/CDNS-1.1d/additions/sv/lib/64bit/libuvmpli.so
+-LICQUEUE
+-COVOVERWRITE
++UVM_TESTNAME=all_gcd_test
+-MESSAGES
+-RUN
+-SV_LIB
+/tools/software/cadence/xcelium/latest/tools/methodology/UVM/CDNS-1.1d/additions/sv/lib/64bit/libuvmdpi.so
++EMGRLOG
+simulation.log
+-XLSTIME
+1761997085
+-XLKEEP
+-XLMODE
+./xcelium.d/run.lnx8664.25.03.d
+-RUNMODE
+-CDSLIB
+./xcelium.d/run.lnx8664.25.03.d/cds.lib
+-HDLVAR
+./xcelium.d/run.lnx8664.25.03.d/hdl.var
+-XLNAME
+xrun
+-XLVERSION
+"TOOL:	xrun(64)	25.03-s003"
+-XLNAME
+./xcelium.d/run.lnx8664.25.03.d/ece-rschsrv.ece.gatech.edu_1196563

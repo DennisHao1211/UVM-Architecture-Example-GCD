@@ -1,0 +1,32 @@
+//
+// File created by:  xrun
+// Do not modify this file
+//
++UVM_MAX_QUIT_COUNT=1
++UVM_VERBOSITY=UVM_FULL
++define++SIM=1
+-loadpli
+/tools/software/cadence/xcelium/latest/tools/methodology/UVM/CDNS-1.1d/additions/sv/lib/64bit/libuvmpli.so:uvm_pli_boot
+-ACCESS
++rwc
+-timescale
+1ns/10ps
+-COVERAGE
+all
+-LICQUEUE
++UVM_TESTNAME=all_gcd_test
+-no_analogsolver
+-MESSAGES
+gcd_tb_top
+-dms_perf
+-XLMODE
+./xcelium.d/run.lnx8664.25.03.d
+-RUNMODE
+-CDSLIB
+./xcelium.d/run.lnx8664.25.03.d/cds.lib
+-HDLVAR
+./xcelium.d/run.lnx8664.25.03.d/hdl.var
+-WORK
+worklib
+-IRUNHASTOP
+-HASXLMODE
